@@ -1,0 +1,337 @@
+% ============================================================
+%  DBMS_10 – Projektvorschlag für die Ausarbeitung
+%  THGA Bochum · Datenbanken · Stephan Bökelmann
+% ============================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{thga-db}
+
+% ----- Metadaten -------------------------------------------
+\renewcommand{\thgaDatum}{Sommersemester 2026}
+
+\begin{document}
+\thispagestyle{empty}
+\thgaTitel{Übung 10 – Projektvorschlag}%
+{Ausarbeitung: Ein eigenes datenbankgestütztes System entwerfen}
+
+\begin{infobox}
+\textbf{Modul:} Einführung in Datenbankmanagementsysteme · THGA Bochum \\
+\textbf{Dozent:} Stephan Bökelmann · \href{mailto:sboekelmann@ep1.rub.de}{sboekelmann@ep1.rub.de} \\
+\textbf{Repository:} \url{https://github.com/MaxClerkwell/DBMS_10} \\
+\textbf{Voraussetzungen:} Vorlesungen 01--10, Übungen DBMS\_01--DBMS\_09 \\
+\textbf{Art der Übung:} Konzeption und schriftliche Abgabe -- \emph{kein} Programmierauftrag \\
+\textbf{Umfang:} 2--4 Seiten Projektvorschlag
+\end{infobox}
+
+\tableofcontents
+\vspace{1em}
+
+% ============================================================
+\section{Worum es in dieser Übung geht}
+% ============================================================
+
+Diese Übung ist bewusst \textbf{anders aufgebaut} als die bisherigen. Sie
+schreiben diesmal keinen Code und arbeiten keine Schritt-für-Schritt-Anleitung
+ab. Stattdessen \textbf{entwerfen} Sie ein eigenes Projekt und reichen dazu einen
+\textbf{Projektvorschlag} beim Dozenten ein.
+
+Der Projektvorschlag ist die Grundlage Ihrer \textbf{Ausarbeitung} -- der
+Prüfungsleistung, in der Sie über das Semester hinweg ein eigenes,
+datenbankgestütztes System bauen. Bevor Sie mit dem Bau beginnen, klären wir
+gemeinsam den \emph{Gegenstand}: Welche Anwendung wollen Sie umsetzen? Welche
+Daten verwaltet sie? Welche Funktionen bietet sie an?
+
+\begin{infobox}
+\textbf{Ziel dieser Übung:} Reichen Sie einen 2--4-seitigen Projektvorschlag
+ein, aus dem hervorgeht, \emph{welches} datenbankgestützte System Sie in der
+Ausarbeitung bauen wollen und \emph{wie} es die Inhalte der Vorlesungen 01--10
+aufgreift.
+\end{infobox}
+
+Der Vorschlag wird vom Dozenten \textbf{gegengelesen und freigegeben}. Erst
+nach der Freigabe beginnen Sie mit der Umsetzung. So stellen wir vor dem
+eigentlichen Aufwand sicher, dass Ihr Vorhaben den richtigen Umfang hat --
+weder zu klein noch zu groß -- und alle Pflichtbausteine abdeckt.
+
+% ============================================================
+\section{Die Ausarbeitung im Überblick}
+% ============================================================
+
+In der Ausarbeitung bauen Sie ein \textbf{vollständiges, datenbankgestütztes
+System für eine Anwendung Ihrer Wahl}. Das Thema ist frei: eine
+Vereinsverwaltung, ein Rezept- und Einkaufsplaner, eine Bibliothek, ein
+Ticketsystem, ein Lager für einen Modellbau-Verein, eine Trainings-App --
+alles ist erlaubt, solange sich sinnvolle Daten und Beziehungen modellieren
+lassen.
+
+Ihre Anwendung soll die Kette abbilden, die wir über das Semester aufgebaut
+haben: \emph{von der Datenmodellierung bis zur laufenden, bedienbaren
+Anwendung.}
+
+\subsection{Der verbindliche Technologie-Stack}
+
+Das System muss aus den folgenden Schichten bestehen. Sie kennen jede Schicht
+bereits aus den Vorlesungen und den vorangegangenen Übungen:
+
+\begin{itemize}[leftmargin=1.4em]
+  \item \textbf{PostgreSQL} als relationales Datenbankmanagementsystem
+        -- Ihr sauber modelliertes Schema mit Schlüsseln und
+        Integritätsbedingungen (VL 03--07).
+  \item \textbf{FastAPI} als REST-Schicht in Python -- die Datenbank wird
+        \emph{nie} direkt vom Frontend angesprochen, sondern immer über die API
+        (VL 08).
+  \item \textbf{Docker Compose} als Betriebsumgebung -- Datenbank und API
+        laufen als Dienste, die mit \texttt{docker compose up} gemeinsam
+        starten (VL 09).
+  \item \textbf{Ein Frontend}, das die API benutzt. Ein \textbf{Python-Frontend}
+        (z.\,B. tkinter wie in VL 10) ist die empfohlene Variante, weil Sie es
+        bereits kennen. Sie dürfen aber auch ein anderes Frontend bauen
+        (Weboberfläche, Kommandozeilenwerkzeug o.\,Ä.), solange es die API
+        nutzt.
+\end{itemize}
+
+\begin{beispielbox}
+\textbf{Die Architektur in einem Satz:}\\[4pt]
+\centerline{%
+  \textbf{Frontend} $\;\longrightarrow\;$ \textbf{FastAPI (REST)}
+  $\;\longrightarrow\;$ \textbf{PostgreSQL}%
+}\\[4pt]
+\centerline{alles orchestriert durch \textbf{Docker Compose}}
+\end{beispielbox}
+
+\subsection{Was eine sinnvolle Größe ist}
+
+Rechnen Sie mit einem Datenmodell von etwa \textbf{drei bis sechs Tabellen} mit
+mindestens einer \texttt{N:M}-Beziehung, einer Handvoll API-Endpunkte (lesend
+\emph{und} schreibend) und einem Frontend, das die wichtigsten dieser Endpunkte
+bedient. Das ist genug, um alle gelernten Konzepte zu zeigen, und wenig genug,
+um im Semester fertig zu werden.
+
+% ============================================================
+\section{Was aus den Vorlesungen einfließen soll}
+% ============================================================
+
+Ihr Vorschlag -- und später die Ausarbeitung -- soll erkennbar auf den Inhalten
+der Vorlesungen \textbf{01--10} aufbauen. Die folgende Tabelle zeigt, welcher
+Baustein aus welcher Vorlesung stammt und woran man ihn im Projekt erkennt.
+
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{@{}p{1.5cm}p{4.6cm}X@{}}
+\toprule
+\textbf{VL} & \textbf{Thema} & \textbf{Woran man es im Projekt erkennt} \\
+\midrule
+01 & Was ist ein DBMS, Drei-Ebenen-Modell & Begründung, \emph{warum} ein
+     relationales DBMS zum Vorhaben passt \\
+02 & ER-Modellierung, Kardinalitäten & Eine ER-Skizze mit Entitäten,
+     Beziehungen und Kardinalitäten \\
+03 & Relationales Modell, Schlüssel & Primär- und Fremdschlüssel, referentielle
+     Integrität \\
+04 & Normalisierung, Normalformen & Ein Schema mindestens in 3NF, ohne
+     Redundanzen \\
+05 & SQL DDL/DML & \texttt{CREATE TABLE}-Skript mit Constraints; Seed-Daten \\
+06 & SQL-Abfragen, JOINs, Aggregation & Abfragen hinter den API-Endpunkten
+     (mind. ein JOIN, eine Aggregation) \\
+07 & PostgreSQL im Betrieb & Ausführung auf PostgreSQL, Init-Skript, Datentypen \\
+08 & Python, psycopg2, FastAPI & Die REST-Schicht mit lesenden und schreibenden
+     Endpunkten \\
+09 & Docker, Compose, .env & \texttt{docker-compose.yml} mit Datenbank + API,
+     Secrets in \texttt{.env} \\
+10 & Frontend-Grundlagen & Ein bedienbares Frontend, das die API nutzt \\
+\bottomrule
+\end{tabularx}
+
+\begin{infobox}
+\textbf{Was \emph{nicht} verpflichtend ist:} Die vertiefenden Inhalte aus den
+Vorlesungen \textbf{10--12} sind \emph{keine} Pflichtbestandteile der
+Ausarbeitung. Konkret sind \textbf{optional}:
+\begin{itemize}[leftmargin=1.4em, topsep=2pt]
+  \item das \emph{Verpacken} des Frontends als nativer Installer
+        (\texttt{.deb}, Setup-\texttt{.exe}, \texttt{.dmg}, PyInstaller) -- VL 10/13,
+  \item fortgeschrittenes Transaktions- und Isolationsverhalten (ACID,
+        Isolation Levels, Sperren, MVCC) -- VL 11,
+  \item Zeitreihendaten, InfluxDB und Grafana -- VL 12.
+\end{itemize}
+Ein \emph{funktionierendes} Frontend genügt; es muss nicht paketiert oder
+installierbar sein. Wer diese Themen dennoch einbaut, darf das gerne als
+freiwillige Erweiterung tun.
+\end{infobox}
+
+% ============================================================
+\section{Der Projektvorschlag -- Ihre Abgabe}
+% ============================================================
+
+Reichen Sie ein PDF von \textbf{2--4 Seiten} ein, das die folgenden Abschnitte
+enthält. Nutzen Sie die Überschriften als Vorlage.
+
+\subsection{Anwendungsdomäne und Motivation}
+
+Beschreiben Sie in wenigen Sätzen, \emph{welche} Anwendung Sie bauen und
+\emph{welches Problem} sie löst. Wer benutzt sie, und wofür? Ein oder zwei
+konkrete Nutzungsszenarien machen den Vorschlag greifbar.
+
+\subsection{Datenmodell -- ER-Skizze}
+
+Zeichnen Sie eine \textbf{ER-Skizze} (VL 02) mit den zentralen Entitätstypen,
+ihren wichtigsten Attributen und den Beziehungen samt \textbf{Kardinalitäten}.
+Eine saubere Handzeichnung als Foto ist völlig ausreichend. Achten Sie darauf,
+dass mindestens eine \texttt{N:M}-Beziehung vorkommt.
+
+\subsection{Vom Modell zum Schema}
+
+Leiten Sie aus dem ER-Modell ein \textbf{Relationenschema} ab (VL 03). Nennen
+Sie pro Tabelle die Spalten, den \textbf{Primärschlüssel} und die
+\textbf{Fremdschlüssel}. Begründen Sie kurz, dass Ihr Schema frei von
+Redundanzen ist (mindestens 3NF, VL 04) -- ein bis zwei Sätze genügen.
+
+\subsection{API-Entwurf}
+
+Skizzieren Sie die geplanten \textbf{FastAPI-Endpunkte} (VL 08). Eine Tabelle
+reicht:
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\linewidth}{@{}p{2cm}p{4cm}X@{}}
+\toprule
+\textbf{Methode} & \textbf{Pfad} & \textbf{Zweck} \\
+\midrule
+\texttt{GET}  & \texttt{/…}  & liest Daten (mit JOIN/Aggregation im Hintergrund) \\
+\texttt{POST} & \texttt{/…}  & legt einen neuen Datensatz an \\
+\multicolumn{3}{@{}l}{\itshape … mindestens ein lesender und ein schreibender Endpunkt} \\
+\bottomrule
+\end{tabularx}
+
+Markieren Sie, hinter welchem Endpunkt eine \textbf{Abfrage mit JOIN} und wo
+eine \textbf{Aggregation} steckt (VL 06).
+
+\subsection{Frontend-Idee}
+
+Beschreiben Sie kurz, wie das Frontend aussieht und welche Endpunkte es bedient
+(VL 10). Ein grobes Wireframe oder eine Aufzählung der Bildschirme/Masken
+genügt. Geben Sie an, ob Sie die empfohlene Python-Variante (tkinter) oder etwas
+anderes nutzen -- und im zweiten Fall, was und warum.
+
+\subsection{Betrieb mit Docker Compose}
+
+Listen Sie die \textbf{Dienste} auf, die in Ihrer \texttt{docker-compose.yml}
+laufen werden (mindestens \texttt{postgres} und \texttt{api}), und wo die
+Zugangsdaten liegen (\texttt{.env}, VL 09).
+
+\subsection{Umfang, Meilensteine und Risiken}
+
+Schätzen Sie den Umfang ehrlich ein: Wie viele Tabellen und Endpunkte? Nennen
+Sie \textbf{2--3 Meilensteine} (z.\,B. ``Schema + Seed-Daten stehen'', ``API
+lesend/schreibend'', ``Frontend bedient die Kern-Endpunkte'') und \textbf{ein
+bis zwei Risiken}, an denen es scheitern könnte.
+
+% ============================================================
+\section{Formale Anforderungen an die Abgabe}
+% ============================================================
+
+\begin{itemize}[leftmargin=1.4em]
+  \item \textbf{Format:} ein PDF, 2--4 Seiten, mit den Abschnitten aus
+        Abschnitt~4.
+  \item \textbf{Abgabe:} per E-Mail an
+        \href{mailto:sboekelmann@ep1.rub.de}{sboekelmann@ep1.rub.de}. Legen Sie
+        das PDF zusätzlich in Ihr Projekt-Repository (etwa als
+        \texttt{docs/proposal.pdf}), sobald Sie eines angelegt haben.
+  \item \textbf{Betreff / Dateiname:} \texttt{Ausarbeitung-Vorschlag
+        <Nachname>}.
+  \item \textbf{Sprache:} Deutsch oder Englisch.
+\end{itemize}
+
+\begin{warnbox}
+\textbf{Beginnen Sie noch nicht mit der Implementierung}, bevor der Vorschlag
+freigegeben ist. Warten Sie die Rückmeldung des Dozenten ab -- sie kann Umfang
+oder Datenmodell noch verschieben und erspart Ihnen so unnötige Arbeit.
+\end{warnbox}
+
+% ============================================================
+\section{Annahmekriterien -- Checkliste}
+% ============================================================
+
+Ihr Vorschlag wird angenommen, wenn er die folgenden Punkte erfüllt. Nutzen Sie
+die Liste als Selbstkontrolle vor der Abgabe.
+
+\begin{itemize}[leftmargin=1.8em, label=$\square$]
+  \item Anwendungsdomäne und Nutzen sind klar beschrieben.
+  \item Eine ER-Skizze mit Kardinalitäten liegt vor; mindestens eine
+        \texttt{N:M}-Beziehung ist enthalten.
+  \item Ein Relationenschema mit Primär- und Fremdschlüsseln ist abgeleitet
+        (3 bis 6 Tabellen, mind. 3NF).
+  \item Mindestens ein lesender und ein schreibender API-Endpunkt sind
+        vorgesehen; JOIN und Aggregation sind verortet.
+  \item Das Frontend und die von ihm genutzten Endpunkte sind skizziert.
+  \item Der Docker-Compose-Betrieb (postgres + api, \texttt{.env}) ist benannt.
+  \item Umfang, Meilensteine und Risiken sind realistisch dargestellt.
+  \item Der verbindliche Stack (PostgreSQL, FastAPI, Docker Compose, Frontend)
+        ist vollständig abgedeckt.
+\end{itemize}
+
+% ============================================================
+\section{Ein durchgängiges Kurzbeispiel}
+% ============================================================
+
+Damit Sie das erwartete Niveau einschätzen können, hier ein stark verkürztes
+Beispiel für die Domäne \emph{``Vereins-Bibliothek''}. Ihr eigener Vorschlag ist
+ausführlicher, dies zeigt nur die Richtung.
+
+\begin{beispielbox}
+\textbf{Domäne.} Eine kleine Vereins-Bibliothek verwaltet Bücher, Mitglieder
+und Ausleihen. Mitglieder sollen sehen, welche Bücher verfügbar sind, und der
+Bibliothekar soll Ausleihen ein- und zurückbuchen.
+
+\medskip
+\textbf{Datenmodell (Ausschnitt).}
+\begin{itemize}[leftmargin=1.4em, topsep=2pt]
+  \item \texttt{mitglied}(\underline{id}, name, email)
+  \item \texttt{buch}(\underline{id}, titel, autor, isbn, bestand)
+  \item \texttt{ausleihe}(\underline{id}, \emph{mitglied\_id}, \emph{buch\_id},
+        von, bis, zurueck) -- realisiert die \texttt{N:M}-Beziehung zwischen
+        Mitglied und Buch.
+\end{itemize}
+
+\textbf{API (Ausschnitt).}
+\begin{itemize}[leftmargin=1.4em, topsep=2pt]
+  \item \texttt{GET /buecher} -- alle Bücher mit Anzahl aktueller Ausleihen
+        (\emph{JOIN + Aggregation}).
+  \item \texttt{GET /mitglieder/\{id\}/ausleihen} -- offene Ausleihen eines
+        Mitglieds (\emph{JOIN}).
+  \item \texttt{POST /ausleihen} -- Buch ausleihen.
+  \item \texttt{POST /rueckgaben} -- Buch zurückbuchen.
+\end{itemize}
+
+\textbf{Frontend.} tkinter-Fenster mit zwei Reitern: ``Bücher'' (Tabelle +
+Suchfeld) und ``Ausleihe'' (Formular für Ausleihe/Rückgabe).
+
+\medskip
+\textbf{Betrieb.} \texttt{docker-compose.yml} mit den Diensten \texttt{postgres}
+und \texttt{api}; Passwörter in \texttt{.env}; Schema und Seed-Daten über ein
+Init-Skript.
+
+\medskip
+\textbf{Meilensteine.} (1)~Schema + Seed-Daten; (2)~API lesend/schreibend;
+(3)~Frontend bedient beide Reiter. \textbf{Risiko:} korrektes Zurückbuchen bei
+gleichzeitig mehreren offenen Ausleihen desselben Buches.
+\end{beispielbox}
+
+% ============================================================
+\section{Nächste Schritte}
+% ============================================================
+
+\begin{enumerate}[leftmargin=1.6em]
+  \item Wählen Sie eine Domäne, die Sie interessiert -- Sie werden ein ganzes
+        Semester daran arbeiten.
+  \item Skizzieren Sie das ER-Modell auf Papier und leiten Sie das Schema ab.
+  \item Füllen Sie die Abschnitte aus Abschnitt~4 aus und prüfen Sie die
+        Checkliste in Abschnitt~6.
+  \item Senden Sie das PDF an den Dozenten und warten Sie die Freigabe ab.
+\end{enumerate}
+
+\vspace{1em}
+\begin{infobox}
+\textbf{Weiterführend:} Die Übungen DBMS\_07 (PostgreSQL), DBMS\_08 (FastAPI),
+DBMS\_09 (Docker Compose) und die Vorlesung~10 (Frontend) sind Ihre wichtigsten
+Referenzen für die Umsetzung. Sie müssen für den Vorschlag nichts Neues lernen
+-- nur das Bekannte auf Ihre eigene Idee anwenden.
+\end{infobox}
+
+\end{document}
