@@ -13,18 +13,6 @@
 \usepackage{thga-db}
 \usepackage{caption}   % enables \captionof inside minipages
 
-% ----- Placeholder figure (delete once you insert a real image) ----
-% Draws a labelled box you can swap for \includegraphics later.
-% Usage: \placeholder{width}{height}{label text}
-\usetikzlibrary{positioning}
-\newcommand{\placeholder}[3]{%
-  \begin{tikzpicture}
-    \node[draw=THGABlau!45, fill=THGABlau!5, very thick, rounded corners=2pt,
-          minimum width=#1, minimum height=#2, align=center, inner sep=6pt,
-          text=THGABlau!75, font=\small\itshape] {#3};
-  \end{tikzpicture}%
-}
-
 % ----- Fill in your metadata -------------------------------
 \renewcommand{\thgaKurs}{Databases}
 \renewcommand{\thgaDatum}{Summer Term 2026}
@@ -45,9 +33,17 @@
 \begin{infobox}
 \textbf{Every figure must be explained in the running text.} A figure never
 stands on its own: refer to it by number and say what it shows -- e.g.
-``Figure~\ref{fig:er} shows the ER model of \dots''. The placeholder boxes below
-mark where your own images go; replace each with \texttt{\textbackslash
-includegraphics} and keep the caption.
+``Figure~\ref{fig:er} shows the ER model of \dots''.
+
+Every figure below is \texttt{example-figure.jpg}, a dummy image shipped with
+this template. Photograph or scan your own sketch, drop the file next to
+\texttt{proposal.tex}, and point \texttt{\textbackslash includegraphics} at it:
+\begin{quote}
+\texttt{\textbackslash includegraphics[width=0.85\textbackslash linewidth]\{er-sketch.jpg\}}
+\end{quote}
+The \texttt{width} option scales the image to a fraction of the text width; the
+file extension may be omitted. Keep the \texttt{\textbackslash caption} and the
+\texttt{\textbackslash label} as they are.
 \end{infobox}
 
 % ============================================================
@@ -63,8 +59,9 @@ it, and for what? Add one or two concrete usage scenarios. >>>
 
 \begin{figure}[ht]
   \centering
-  % Replace the placeholder with: \includegraphics[width=0.85\linewidth]{er-sketch.jpg}
-  \placeholder{0.85\linewidth}{4.5cm}{[ placeholder ]\\ your ER sketch goes here\\ (a photographed hand drawing is fine)}
+  % Swap example-figure.jpg for your own file, e.g. er-sketch.jpg
+  % (a photographed hand drawing is fine).
+  \includegraphics[width=0.85\linewidth]{example-figure.jpg}
   \caption{ER sketch of the <<< domain >>> data model: entity types, key
   attributes, relationships and cardinalities (at least one N:M).}
   \label{fig:er}
@@ -116,17 +113,17 @@ Python/tkinter is recommended; if you use something else, say what and why. The
 frontend is delivered as a .deb installer and asks for the API URL and X-API-Key
 in a connection dialog at startup. >>>
 
-% The four boxes below are placeholders. Replace each \placeholder{...} with
-% \includegraphics[width=\linewidth]{your-sketch.jpg} and keep the \captionof.
+% Each \includegraphics below still points at the dummy example-figure.jpg.
+% Swap in your own file per screen, e.g. {fe-connect.jpg}, and keep the \captionof.
 \begin{figure}[ht]
 \centering
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \placeholder{\linewidth}{3.5cm}{[ placeholder ]\\ connection dialog}
+  \includegraphics[width=\linewidth]{example-figure.jpg}
   \captionof{figure}{Startup connection dialog: API URL + X-API-Key.}
   \label{fig:fe-connect}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \placeholder{\linewidth}{3.5cm}{[ placeholder ]\\ main / list screen}
+  \includegraphics[width=\linewidth]{example-figure.jpg}
   \captionof{figure}{Main screen: <<< list/table, calls \texttt{GET /<<<…>>>} >>>.}
   \label{fig:fe-main}
 \end{minipage}
@@ -134,12 +131,12 @@ in a connection dialog at startup. >>>
 \vspace{1em}
 
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \placeholder{\linewidth}{3.5cm}{[ placeholder ]\\ detail / form screen}
+  \includegraphics[width=\linewidth]{example-figure.jpg}
   \captionof{figure}{Detail form: <<< create/edit, calls \texttt{POST /<<<…>>>} >>>.}
   \label{fig:fe-detail}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \placeholder{\linewidth}{3.5cm}{[ placeholder ]\\ second feature screen}
+  \includegraphics[width=\linewidth]{example-figure.jpg}
   \captionof{figure}{<<< Second feature screen and the endpoint it calls >>>.}
   \label{fig:fe-second}
 \end{minipage}
