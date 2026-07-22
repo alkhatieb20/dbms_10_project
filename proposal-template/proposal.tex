@@ -34,7 +34,7 @@ stands on its own: refer to it by number and say what it shows -- e.g.
 Photograph or scan your own sketch, drop the file next to
 \texttt{proposal.tex}, and point \texttt{\textbackslash includegraphics} at it:
 \begin{quote}
-\texttt{\textbackslash includegraphics[width=0.85\textbackslash linewidth]\{er-sketch.jpg\}}
+\texttt{\textbackslash includegraphics[width=0.85\textbackslash linewidth]\{er-sketch\}}
 \end{quote}
 The \texttt{width} option scales the image to a fraction of the text width; the
 file extension may be omitted. Keep the \texttt{\textbackslash caption} and the
@@ -105,12 +105,12 @@ The frontend is developed in Python using the \texttt{tkinter} library, as it en
 \begin{figure}[ht]
 \centering
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \includegraphics[width=\linewidth]{fe-connect.jpg}
+  \includegraphics[width=\linewidth]{fe-connect}
   \captionof{figure}{Startup connection dialog: API URL + X-API-Key.}
   \label{fig:fe-connect}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \includegraphics[width=\linewidth]{fe-main.jpg}
+  \includegraphics[width=\linewidth]{fe-main}
   \captionof{figure}{Main screen: List of courses and questions, calls \texttt{GET /courses}.}
   \label{fig:fe-main}
 \end{minipage}
@@ -118,12 +118,12 @@ The frontend is developed in Python using the \texttt{tkinter} library, as it en
 \vspace{1em}
 
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \includegraphics[width=\linewidth]{fe-detail.jpg}
+  \includegraphics[width=\linewidth]{fe-detail}
   \captionof{figure}{Detail form: Create/edit a question, calls \texttt{POST /questions}.}
   \label{fig:fe-detail}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \includegraphics[width=\linewidth]{fe-generator.jpg}
+  \includegraphics[width=\linewidth]{fe-generator}
   \captionof{figure}{Exam Generator: Overview of an exam, calls \texttt{GET /exams/\{id\}/details}.}
   \label{fig:fe-second}
 \end{minipage}
