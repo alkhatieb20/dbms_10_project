@@ -7,13 +7,13 @@
 \usepackage{thga-db}
 \usepackage{caption}   % enables \captionof inside minipages
 \usepackage[utf8]{inputenc}
-\usepackage[ngerman]{babel}
+\usepackage[english]{babel}
 
 % ----- Fill in your metadata -------------------------------
 \renewcommand{\thgaKurs}{Databases}
-\renewcommand{\thgaDatum}{Sommersemester 2026}
+\renewcommand{\thgaDatum}{Summer Term 2026}
 \newcommand{\authorName}{Abdullah Alkhatieb (259697)}
-\newcommand{\projectTitle}{Projekt P01\_AUP: Automatische Prüfungserstellung}
+\newcommand{\projectTitle}{Project P01\_AUP: Automatic Exam Generation}
 
 \begin{document}
 \thispagestyle{empty}
@@ -31,8 +31,7 @@
 stands on its own: refer to it by number and say what it shows -- e.g.
 ``Figure~\ref{fig:er} shows the ER model of \dots''.
 
-Every figure below is \texttt{example-figure.jpg}, a dummy image shipped with
-this template. Photograph or scan your own sketch, drop the file next to
+Photograph or scan your own sketch, drop the file next to
 \texttt{proposal.tex}, and point \texttt{\textbackslash includegraphics} at it:
 \begin{quote}
 \texttt{\textbackslash includegraphics[width=0.85\textbackslash linewidth]\{er-sketch.jpg\}}
@@ -43,138 +42,139 @@ file extension may be omitted. Keep the \texttt{\textbackslash caption} and the
 \end{infobox}
 
 % ============================================================
-\section{Anwendungsbereich und Motivation}
+\section{Application domain and motivation}
 % ============================================================
 
-Die manuelle Erstellung von Prüfungsbögen ist ein zeitaufwendiger und fehleranfälliger Prozess. Häufig kommt es zu Fehlern bei der Berechnung der Gesamtpunktzahl oder zu Formatierungsproblemen. Dieses Projekt löst das Problem durch ein datenbankgestütztes Fragen-Management-System. Dozenten und Lehrkräfte nutzen die Anwendung, um Prüfungsfragen (inklusive LaTeX-Code für Formeln) zentral zu speichern und dynamisch zu Prüfungsbögen zusammenzustellen. 
-Ein konkretes Anwendungsszenario ist das Anlegen einer neuen Frage im Bereich "Betriebssysteme". Ein zweites Szenario ist die automatische Generierung einer Prüfung, bei der das System die Fragen zusammenführt und die Gesamtpunktzahl fehlerfrei aggregiert.
+The manual creation of exam papers and their corresponding solution keys is a time-consuming and error-prone process. Errors frequently occur in calculating the total score or in formatting. This project solves the problem through a database-backed question management system. Lecturers and teachers use the application to centrally store exam questions (including LaTeX code for mathematical formulas) and dynamically compile them into exam papers. 
+A concrete usage scenario is a teacher creating a new question in the "Operating Systems" domain and adding it to the question bank. A second scenario is the automatic generation of an exam, where the system merges selected questions, properly formats them, and correctly aggregates the total score.
 
 % ============================================================
-\section{Datenmodell -- ER-Skizze}
+\section{Data model -- ER sketch}
 % ============================================================
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.85\linewidth]{example-figure.jpg}
-  \caption{ER-Skizze des Prüfungsdatenbank-Modells: Entitätstypen, Schlüsselattribute, Beziehungen und Kardinalitäten (mit N:M-Beziehung).}
+  % Replace 'er-sketch.jpg' with your actual hand-drawn ER diagram file name
+  \includegraphics[width=0.85\linewidth]{er-sketch.jpg}
+  \caption{ER sketch of the Exam Database model: entity types, key attributes, relationships, and cardinalities (including an N:M relationship).}
   \label{fig:er}
 \end{figure}
 
-Abbildung~\ref{fig:er} zeigt das ER-Modell des Systems. Die zentralen Entitätstypen sind \texttt{Kurse}, \texttt{Themen}, \texttt{Fragen} und \texttt{Pruefungen}. Die Schlüsselattribute sind jeweils eindeutige IDs (z.B. \texttt{kurs\_id}). Eine 1:N-Beziehung besteht zwischen Kursen und Themen sowie zwischen Themen und Fragen. Besonders hervorzuheben ist die N:M-Beziehung zwischen \texttt{Pruefungen} und \texttt{Fragen} (Tabelle \texttt{Pruefungs\_Fragen}), da eine Prüfung aus vielen Fragen besteht und eine Frage in verschiedenen Prüfungen wiederverwendet werden kann. Diese Beziehung speichert zudem die zugewiesenen Punkte und die Reihenfolge.
+Figure~\ref{fig:er} shows the ER model of the system. The central entity types are \texttt{Courses}, \texttt{Topics}, \texttt{Questions}, and \texttt{Exams}. The key attributes are unique IDs (e.g., \texttt{course\_id}). A 1:N relationship exists between Courses and Topics, and between Topics and Questions. Particularly noteworthy is the N:M relationship between \texttt{Exams} and \texttt{Questions} (resolved by the junction table \texttt{Exam\_Questions}), as an exam consists of many questions, and a question can be reused across different exams. This relationship also stores the assigned points and the sequence order of the question in the specific exam.
 
 % ============================================================
-\section{Vom Modell zum Schema}
+\section{From model to schema}
 % ============================================================
 
-Das relationale Schema umfasst fünf Tabellen. Primärschlüssel sind unterstrichen, Fremdschlüssel kursiv hervorgehoben:
+The relational schema consists of five tables. Primary keys are \underline{underlined}, and foreign keys are in \emph{italics}:
 
 \begin{itemize}
-  \item \texttt{Kurse}(\underline{kurs\_id}, kurs\_code, kurs\_name)
-  \item \texttt{Themen}(\underline{thema\_id}, \emph{kurs\_id}, thema\_name)
-  \item \texttt{Fragen}(\underline{frage\_id}, \emph{thema\_id}, frage\_text, latex\_inhalt, punkte\_standard, schwierigkeitsgrad)
-  \item \texttt{Pruefungen}(\underline{pruefung\_id}, \emph{kurs\_id}, pruefung\_titel, datum, gesamt\_punkte)
-  \item \texttt{Pruefungs\_Fragen}(\underline{\emph{pruefung\_id}, \emph{frage\_id}}, reihenfolge, zugewiesene\_punkte)
+  \item \texttt{Courses}(\underline{course\_id}, course\_code, course\_name)
+  \item \texttt{Topics}(\underline{topic\_id}, \emph{course\_id}, topic\_name)
+  \item \texttt{Questions}(\underline{question\_id}, \emph{topic\_id}, question\_text, latex\_content, default\_points, difficulty)
+  \item \texttt{Exams}(\underline{exam\_id}, \emph{course\_id}, exam\_title, exam\_date, total\_points)
+  \item \texttt{Exam\_Questions}(\underline{\emph{exam\_id}, \emph{question\_id}}, sequence\_order, assigned\_points)
 \end{itemize}
 
-\textbf{Normalisierung.} Das Schema befindet sich in der 3. Normalform (3NF), da alle Attribute atomar sind, ausschließlich vom jeweiligen Primärschlüssel abhängen und keine transitiven Abhängigkeiten zwischen Nicht-Schlüssel-Attributen bestehen. Dies verhindert Datenredundanz.
+\textbf{Normalisation.} The schema is in the 3rd Normal Form (3NF) because all attributes are atomic, depend solely on their respective whole primary key, and there are no transitive dependencies between non-key attributes. This structure prevents data redundancy.
 
 % ============================================================
-\section{API-Design}
+\section{API design}
 % ============================================================
 
-Das Backend stellt REST-Endpunkte über FastAPI bereit. Lesezugriffe sind öffentlich, während alle Schreibzugriffe durch einen X-API-Key geschützt sind.
+The backend provides REST endpoints via FastAPI. Read accesses are public, while all write accesses (creating, updating, deleting) are protected by an X-API-Key.
 
 \renewcommand{\arraystretch}{1.2}
-\begin{tabularx}{\linewidth}{@{}p{2cm}p{4cm}X@{}}
+\begin{tabularx}{\linewidth}{@{}p{2cm}p{4.5cm}X@{}}
 \toprule
 \textbf{Method} & \textbf{Path} & \textbf{Purpose} \\
 \midrule
-\texttt{GET}  & \texttt{/kurse} & Liest alle Kurse und deren Themen. \\
-\texttt{GET}  & \texttt{/pruefungen/\{id\}/details} & Liest eine Prüfung inkl. Fragen (JOIN über Pruefungs\_Fragen + Aggregation der Gesamtpunkte). \\
-\texttt{POST} & \texttt{/fragen} & Erstellt eine neue Frage (erfordert X-API-Key). \\
-\texttt{POST} & \texttt{/pruefungen/\{id\}/fragen} & Weist einer Prüfung eine Frage zu (erfordert X-API-Key). \\
+\texttt{GET}  & \texttt{/courses} & Reads all courses and their topics. \\
+\texttt{GET}  & \texttt{/exams/\{id\}/details} & Reads an exam including questions (JOIN via Exam\_Questions + aggregation of total points). \\
+\texttt{POST} & \texttt{/questions} & Creates a new question (requires X-API-Key). \\
+\texttt{POST} & \texttt{/exams/\{id\}/questions} & Assigns a question to an exam (requires X-API-Key). \\
 \bottomrule
 \end{tabularx}
 
 % ============================================================
-\section{Frontend-Prototyp}
+\section{Frontend prototype (hand sketches)}
 % ============================================================
 
-Das Frontend wird in Python mit der \texttt{tkinter}-Bibliothek entwickelt, da es eine modulare Desktop-GUI ohne zusätzliche Web-Abhängigkeiten ermöglicht. Die Anwendung wird als eigenständiges \texttt{.deb}-Installationspaket bereitgestellt. Beim Start öffnet sich ein modaler Dialog zur Eingabe der API-URL und des X-API-Keys.
+The frontend is developed in Python using the \texttt{tkinter} library, as it enables a modular desktop GUI without additional web dependencies. The application is packaged as a standalone \texttt{.deb} installer. At startup, a modal connection dialog opens to collect the API URL and the X-API-Key.
 
 \begin{figure}[ht]
 \centering
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \includegraphics[width=\linewidth]{example-figure.jpg}
-  \captionof{figure}{Verbindungsdialog: Abfrage von API URL + X-API-Key beim Start.}
+  \includegraphics[width=\linewidth]{fe-connect.jpg}
+  \captionof{figure}{Startup connection dialog: API URL + X-API-Key.}
   \label{fig:fe-connect}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \includegraphics[width=\linewidth]{example-figure.jpg}
-  \captionof{figure}{Hauptbildschirm: Liste der Kurse und Fragen, ruft \texttt{GET /kurse} auf.}
+  \includegraphics[width=\linewidth]{fe-main.jpg}
+  \captionof{figure}{Main screen: List of courses and questions, calls \texttt{GET /courses}.}
   \label{fig:fe-main}
 \end{minipage}
 
 \vspace{1em}
 
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \includegraphics[width=\linewidth]{example-figure.jpg}
-  \captionof{figure}{Detailformular: Frage anlegen/bearbeiten, ruft \texttt{POST /fragen} auf.}
+  \includegraphics[width=\linewidth]{fe-detail.jpg}
+  \captionof{figure}{Detail form: Create/edit a question, calls \texttt{POST /questions}.}
   \label{fig:fe-detail}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\linewidth}\centering
-  \includegraphics[width=\linewidth]{example-figure.jpg}
-  \captionof{figure}{Prüfungsgenerator: Übersicht einer Prüfung, ruft \texttt{GET /pruefungen/\{id\}/details} auf.}
+  \includegraphics[width=\linewidth]{fe-generator.jpg}
+  \captionof{figure}{Exam Generator: Overview of an exam, calls \texttt{GET /exams/\{id\}/details}.}
   \label{fig:fe-second}
 \end{minipage}
 \end{figure}
 
-Abbildungen~\ref{fig:fe-connect}--\ref{fig:fe-second} zeigen die vier Ansichten des Prototyps. Abbildung~\ref{fig:fe-connect} zeigt den Verbindungsdialog, der die API-URL und den X-API-Key abfragt. Abbildung~\ref{fig:fe-main} zeigt den Hauptbildschirm mit der Tabellenübersicht der vorhandenen Daten. Abbildung~\ref{fig:fe-detail} stellt das Formular zum Erstellen und Bearbeiten einer Frage dar (Schreibzugriff). Abbildung~\ref{fig:fe-second} zeigt den Prüfungsgenerator, der die zugewiesenen Fragen anzeigt und die aggregierten Gesamtpunkte der Prüfung berechnet.
+Figures~\ref{fig:fe-connect}--\ref{fig:fe-second} show the four screens of the prototype. Figure~\ref{fig:fe-connect} shows the connection dialog that collects the API URL and X-API-Key at startup. Figure~\ref{fig:fe-main} shows the main screen with the table overview of existing data. Figure~\ref{fig:fe-detail} presents the form used to create and edit a question (write access). Figure~\ref{fig:fe-second} shows the exam generator screen, which displays the assigned questions and calculates the aggregated total points of the exam.
 
 % ============================================================
-\section{Betrieb mit Docker Compose}
+\section{Operation with Docker Compose}
 % ============================================================
 
-Das Backend besteht aus zwei Services in der \texttt{docker-compose.yml}: \texttt{postgres} (Datenbank) und \texttt{api} (FastAPI-Server). Sensible Daten wie Datenbankpasswörter und der festgelegte X-API-Key werden sicher in einer \texttt{.env}-Datei gespeichert. Beide Container werden auf dem Vorlesungsserver deployed und kommunizieren intern, während die API nach außen über HTTP angesprochen wird.
+The backend consists of two services in the \texttt{docker-compose.yml}: \texttt{postgres} (the database) and \texttt{api} (the FastAPI server). Sensitive credentials like database passwords and the X-API-Key are securely stored in a \texttt{.env} file. Both containers are deployed on the lecture server and communicate internally, while the API is exposed externally via HTTP.
 
 % ============================================================
-\section{Umfang, Meilensteine und Risiken}
+\section{Scope, milestones and risks}
 % ============================================================
 
-\textbf{Umfang.} Das System umfasst 5 Tabellen und ca. 8 REST-Endpunkte (CRUD-Operationen und komplexe JOINs).
+\textbf{Scope.} The system encompasses 5 tables and approximately 8 REST endpoints (CRUD operations and complex JOINs).
 
-\textbf{Meilensteine und Zeitplan.} Die Gesamtarbeitszeit wird auf etwa 40 Stunden geschätzt.
+\textbf{Milestones and schedule.} The total workload is estimated to be roughly 40 hours.
 
 \renewcommand{\arraystretch}{1.2}
 \begin{tabularx}{\linewidth}{@{}p{1.4cm}Xp{1.8cm}@{}}
 \toprule
 \textbf{Week} & \textbf{Milestone} & \textbf{Est. hours} \\
 \midrule
-1   & Datenbankschema in PostgreSQL \& Seed-Daten implementiert & 8 \\
-2--3 & FastAPI Backend \& Absicherung durch X-API-Key & 12 \\
-4--5 & Tkinter Frontend steuert Kernfunktionen, \texttt{.deb}-Paket & 10 \\
-6   & Tests, CI-Dokumentation \& Präsentationsvideo & 10 \\
+1   & Database schema in PostgreSQL \& Seed data implemented & 8 \\
+2--3 & FastAPI backend \& Security via X-API-Key & 12 \\
+4--5 & Tkinter frontend operates core endpoints, \texttt{.deb} packaged & 10 \\
+6   & Tests, CI documentation \& presentation video & 10 \\
 \bottomrule
 \end{tabularx}
 
-\textbf{Risiken.} Ein Risiko besteht darin, dass die Punkte in der N:M-Beziehung (Tabelle \texttt{Pruefungs\_Fragen}) bei Aktualisierungen falsch aggregiert werden. Ein weiteres Risiko ist, dass blockierende HTTP-Requests (ohne Threading/After-Callbacks) die Tkinter-GUI einfrieren lassen.
+\textbf{Risks.} One risk is that the points in the N:M relationship (table \texttt{Exam\_Questions}) might be incorrectly aggregated during updates. Another risk is that blocking HTTP requests (without threading or \texttt{after}-callbacks) could freeze the Tkinter GUI.
 
 % ============================================================
-\section{Akzeptanzkriterien und Tests}
+\section{Acceptance criteria and testing}
 % ============================================================
 
-\textbf{Akzeptanzkriterien.}
+\textbf{Acceptance criteria.}
 \begin{itemize}[topsep=2pt]
-  \item Schreibzugriffe ohne gültigen X-API-Key im HTTP-Header werden abgelehnt (API liefert 401/403 Unauthorized).
-  \item \texttt{GET /pruefungen/\{id\}/details} liefert die exakte Summe der Punkte (JOIN + Aggregation) für die Prüfung.
-  \item Wenn ein Thema gelöscht wird, werden alle zugehörigen Fragen kaskadierend entfernt (ON DELETE CASCADE).
+  \item Write accesses without a valid X-API-Key in the HTTP header are rejected (API returns 401/403 Unauthorized).
+  \item \texttt{GET /exams/\{id\}/details} returns the exact sum of points (JOIN + Aggregation) for the exam.
+  \item When a topic is deleted, all related questions are removed (ON DELETE CASCADE).
 \end{itemize}
 
-\textbf{Testplan.}
+\textbf{Test plan.}
 \begin{itemize}[topsep=2pt]
-  \item \textbf{Database:} Verifizierung der PK/FK-Constraints, UNIQUE-Regeln und der CASCADE-Löschvorgänge.
-  \item \textbf{API:} Automatisierte Tests mit \texttt{pytest} und FastAPIs \texttt{TestClient} (Happy Path und Fehlerfälle wie ungültiger X-API-Key).
-  \item \textbf{Business rule:} Ein Testfall, der eine Prüfung mit mindestens drei zugewiesenen Fragen simuliert und prüft, ob die vom Server zurückgegebene Gesamtpunktzahl mathematisch exakt übereinstimmt, um das Risiko von Berechnungsfehlern bei N:M-Beziehungen auszuschließen.
+  \item \textbf{Database:} Verification of PK/FK constraints, UNIQUE rules, and CASCADE deletions.
+  \item \textbf{API:} Automated tests with \texttt{pytest} and FastAPI's \texttt{TestClient} (happy path and error cases like invalid X-API-Key).
+  \item \textbf{Business rule:} A test case simulating an exam with at least three assigned questions, verifying whether the total points returned by the server mathematically match the sum, thus eliminating the risk of calculation errors in N:M relationships.
 \end{itemize}
 
 \vspace{1em}
