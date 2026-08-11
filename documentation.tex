@@ -1,0 +1,205 @@
+% ============================================================
+%  TERM PROJECT – DOCUMENTATION
+%  Databases · THGA Bochum
+% ============================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{thga-db}
+
+\renewcommand{\thgaKurs}{Databases}
+\renewcommand{\thgaDatum}{Summer Term 2026}
+
+\begin{document}
+\thispagestyle{empty}
+\thgaTitel{Term Project – Projektdokumentation}%
+{Project P01 AUP: Automatic Exam Generation}
+
+\begin{infobox}
+\textbf{Autor:} Abdullah Alkhatieb (259697) \\
+\textbf{Modul:} Introduction to Database Management Systems · THGA Bochum \\
+\textbf{Stack:} PostgreSQL · FastAPI · Docker Compose · tkinter (\texttt{.deb}) \\
+\textbf{Repository:} \url{https://github.com/<user>/exam-generation}
+\end{infobox}
+
+\tableofcontents
+\vspace{1em}
+
+% ============================================================
+\section{Einleitung und Motivation}
+% ============================================================
+
+Die manuelle Erstellung von Prüfungsbögen und den dazugehörigen Musterlösungen ist ein zeitaufwändiger und fehleranfälliger Prozess. Häufig kommt es zu Fehlern bei der Berechnung der Gesamtpunktzahl oder bei der Formatierung komplexer Formeln. 
+
+Das \textbf{Automatic Exam Generation} System löst dieses Problem durch eine datenbankgestützte Anwendung. Es verwaltet \textbf{Kurse}, \textbf{Themen}, \textbf{Fragen} und \textbf{Prüfungen}. Es stellt die Daten über eine REST-API bereit und bietet eine Desktop-GUI (Frontend) für Dozenten.
+
+\begin{beispielbox}
+\textbf{Nutzungsszenario.} Ein Dozent öffnet das Frontend, gibt seinen sicheren API-Key ein und erstellt eine neue Frage zum Thema "Betriebssysteme" inklusive LaTeX-Code. Anschließend öffnet er den "Exam Generator", der automatisch die ausgewählten Fragen für die Klausur "SoSe 2026" zusammenführt und die exakte Gesamtpunktzahl (z.B. 30 Punkte) berechnet.
+\end{beispielbox}
+
+% ============================================================
+\section{Datenmodell}
+% ============================================================
+
+Das System umfasst fünf Entitätstypen. Eine \textbf{Prüfung (Exam)} kann aus vielen \textbf{Fragen (Questions)} bestehen, und eine Frage kann in mehreren Prüfungen wiederverwendet werden. Dies ist eine \texttt{N:M}-Beziehung, die durch die Verbindungstabelle \textbf{Exam\_Questions} aufgelöst wird.
+
+\begin{beispielbox}
+\textbf{ER-Modell (textuell).}
+\begin{itemize}[leftmargin=1.4em, topsep=2pt]
+  \item \textbf{course} (1) \;--\; hat \;--\; (N) \textbf{topic}
+  \item \textbf{topic} (1) \;--\; enthält \;--\; (N) \textbf{question}
+  \item \textbf{exam} (1) \;--\; beinhaltet \;--\; (N) \textbf{exam\_questions}
+  \item \textbf{question} (1) \;--\; wird verwendet in \;--\; (N) \textbf{exam\_questions}
+\end{itemize}
+Somit \textbf{exam} \texttt{N:M} \textbf{question}, aufgelöst durch \textbf{exam\_questions}.
+\end{beispielbox}
+
+\subsection{Relationales Schema}
+
+Abgeleitet aus dem ER-Modell, mit Primärschlüsseln unterstrichen und Fremdschlüsseln kursiv:
+
+\begin{itemize}[leftmargin=1.4em]
+  \item \texttt{courses}(\underline{course\_id}, course\_code, course\_name)
+  \item \texttt{topics}(\underline{topic\_id}, \emph{course\_id}, topic\_name)
+  \item \texttt{questions}(\underline{question\_id}, \emph{topic\_id}, question\_text, latex\_content, default\_points, difficulty)
+  \item \texttt{exams}(\underline{exam\_id}, \emph{course\_id}, exam\_title, exam\_date)
+  \item \texttt{exam\_questions}(\underline{\emph{exam\_id}, \emph{question\_id}}, sequence\_order, assigned\_points)
+\end{itemize}
+
+\textbf{Normalisierung.} Jedes Nicht-Schlüssel-Attribut hängt nur vom gesamten Primärschlüssel seiner Tabelle ab. Es gibt keine transitiven Abhängigkeiten. Das Schema befindet sich daher in der \textbf{3. Normalform (3NF)}.
+
+% ============================================================
+\section{Datenbank (PostgreSQL)}
+% ============================================================
+
+Das Schema und die Startdaten (Seed-Daten) werden durch ein Initialisierungsskript erstellt, das PostgreSQL beim ersten Start ausführt.
+
+\begin{lstlisting}[language=SQL, caption={init.sql (Auszug) -- N:M Beziehung und Daten}]
+CREATE TABLE exam_questions (
+    exam_id INTEGER NOT NULL REFERENCES exams(exam_id) ON DELETE CASCADE,
+    question_id INTEGER NOT NULL REFERENCES questions(question_id) ON DELETE CASCADE,
+    sequence_order INTEGER NOT NULL,
+    assigned_points INTEGER NOT NULL,
+    PRIMARY KEY (exam_id, question_id)
+);
+
+INSERT INTO exam_questions (exam_id, question_id, sequence_order, assigned_points) VALUES 
+(1, 1, 1, 10),
+(1, 2, 2, 15),
+(1, 3, 3, 5);
+\end{lstlisting}
+
+% ============================================================
+\section{REST API (FastAPI)}
+% ============================================================
+
+Die API ist die einzige Komponente, die mit der Datenbank kommuniziert. Lese-Endpunkte sind öffentlich, während Schreib-Endpunkte den Header \texttt{X-API-Key} erfordern.
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\linewidth}{@{}p{1.6cm}p{4.8cm}Xc@{}}
+\toprule
+\textbf{Method} & \textbf{Path} & \textbf{Purpose} & \textbf{Key} \\
+\midrule
+\texttt{GET}  & \texttt{/courses} & Kurse und Themen abrufen & -- \\
+\texttt{GET}  & \texttt{/exams/\{id\}/details} & Prüfungsdetails + Gesamtpunktzahl (JOIN + Aggregation) & -- \\
+\texttt{POST} & \texttt{/questions} & Neue Frage erstellen & Ja \\
+\bottomrule
+\end{tabularx}
+
+\medskip
+Der Endpunkt \texttt{/exams/\{id\}/details} demonstriert einen \textbf{JOIN} in Kombination mit einer \textbf{Aggregation}: Er berechnet die mathematisch exakte Summe der Punkte für eine spezifische Prüfung, um fehlerhafte manuelle Berechnungen auszuschließen.
+
+\begin{lstlisting}[language=SQL, caption={Query hinter GET /exams/\{id\}/details (JOIN + Aggregation)}]
+SELECT e.exam_id, e.exam_title, e.exam_date,
+       COALESCE(SUM(eq.assigned_points), 0) AS calculated_total_points
+FROM exams e
+LEFT JOIN exam_questions eq ON e.exam_id = eq.exam_id
+WHERE e.exam_id = %s
+GROUP BY e.exam_id, e.exam_title, e.exam_date;
+\end{lstlisting}
+
+Der Schreibzugriff ist durch eine API-Key-Prüfung geschützt (adaptiert aus Vorlesung 09):
+
+\begin{lstlisting}[language=Python, caption={API-Key Guard}]
+from fastapi import Header, HTTPException
+import os
+
+EXPECTED_API_KEY = os.environ.get("API_KEY")
+
+def require_api_key(x_api_key: str = Header(...)):
+    if x_api_key != EXPECTED_API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid API Key")
+\end{lstlisting}
+
+% ============================================================
+\section{Frontend (tkinter, verpackt als .deb)}
+% ============================================================
+
+Das Frontend ist eine tkinter-Anwendung. Es kommuniziert ausschließlich über HTTP-Anfragen mit der API und greift nie direkt auf die Datenbank zu. Blockierende Anfragen werden über Hintergrund-Threads (Threading) abgearbeitet, um ein Einfrieren der GUI zu verhindern.
+
+Beim Start wird ein \textbf{Verbindungsdialog (Connection Dialog)} angezeigt, der nach der API-URL und dem \texttt{X-API-Key} fragt. Der Key wird nur im Arbeitsspeicher gehalten.
+
+\textbf{Paketierung.} Die Anwendung wird mit PyInstaller eingefroren und mit \texttt{fpm} in ein Debian-Paket verpackt, sodass sie auf dem Vorlesungsserver nativ installiert werden kann:
+
+\begin{lstlisting}[caption={Bauen und Installieren der .deb-Datei}]
+uv run pyinstaller --name exam-frontend --onedir --windowed src/exam_frontend/__main__.py
+mkdir -p pkg/usr/bin && cp -r dist/exam-frontend pkg/usr/bin/
+fpm -s dir -t deb --name exam-frontend --version 0.1.0 --architecture amd64 -C pkg .
+sudo dpkg -i exam-frontend_0.1.0_amd64.deb
+\end{lstlisting}
+
+% ============================================================
+\section{Betrieb und Deployment}
+% ============================================================
+
+Das Backend läuft als zwei Container, die durch Docker Compose orchestriert und bereitgestellt werden. Anmeldeinformationen (Passwörter, API-Key) befinden sich sicher in einer \texttt{.env}-Datei.
+
+\begin{lstlisting}[caption={docker-compose.yml (Auszug)}]
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  api:
+    build: .
+    environment:
+      API_KEY: ${API_KEY}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    ports: ["8000:8000"]
+    depends_on: [postgres]
+volumes:
+  pg_data:
+\end{lstlisting}
+
+\textbf{Deployment-Schritte auf dem Server.}
+\begin{enumerate}[leftmargin=1.6em, topsep=2pt]
+  \item \texttt{docker compose up -d --build} -- Startet Datenbank und API.
+  \item \texttt{docker compose exec api pytest -v} -- Führt automatisierte Tests aus.
+  \item \texttt{sudo dpkg -i exam-frontend\_0.1.0\_amd64.deb} -- Installiert das Frontend.
+  \item Starten Sie \texttt{exam-frontend} (über /usr/bin/exam-frontend/exam-frontend) und verbinden Sie sich über den Dialog.
+\end{enumerate}
+
+% ============================================================
+\section{Reflexion}
+% ============================================================
+
+Die strikte Trennung von Datenbank, API und Frontend (Separation of Concerns) war entscheidend für den Erfolg. Die API konnte mit \texttt{pytest} vollständig automatisiert getestet werden (einschließlich 401 Unauthorized-Fehler und der Geschäftsregel für korrekte Punktaggregation), lange bevor die grafische Benutzeroberfläche existierte. Die größte Herausforderung bestand in der korrekten Implementierung des Threading-Modells im Frontend, um die UI während der HTTP-Aufrufe reaktionsfähig zu halten.
+
+% ============================================================
+\section*{Quellen und Wiederverwendung}
+% ============================================================
+\addcontentsline{toc}{section}{Quellen und Wiederverwendung}
+
+Mit Quellenangabe wiederverwendet:
+\begin{itemize}[leftmargin=1.4em, topsep=2pt]
+  \item API-Key Guard, Threading-Struktur und Docker-Compose-Setup -- adaptiert aus \textbf{DBMS\_09} und \textbf{Vorlesung 09}.
+  \item Modaler Tkinter-Verbindungsdialog -- adaptiert aus \textbf{Vorlesung 10}.
+  \item PyInstaller / \texttt{fpm} Paketierungsbefehle -- gemäß den Richtlinien der \textbf{Vorlesung 10 / 13}.
+\end{itemize}
+
+\end{document}
+
