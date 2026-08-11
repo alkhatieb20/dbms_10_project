@@ -18,7 +18,7 @@
 \textbf{Autor:} Abdullah Alkhatieb (259697) \\
 \textbf{Modul:} Introduction to Database Management Systems · THGA Bochum \\
 \textbf{Stack:} PostgreSQL · FastAPI · Docker Compose · tkinter (\texttt{.deb}) \\
-\textbf{Repository:} \url{https://github.com/alkhatieb20/dbms_10_project}
+\textbf{Repository:} \texttt{https://github.com/alkhatieb20/dbms\_10\_project}
 \end{infobox}
 
 \tableofcontents
@@ -138,7 +138,7 @@ Das Frontend ist eine tkinter-Anwendung. Es kommuniziert ausschließlich über H
 
 Beim Start wird ein \textbf{Verbindungsdialog (Connection Dialog)} angezeigt, der nach der API-URL und dem \texttt{X-API-Key} fragt. Der Key wird nur im Arbeitsspeicher gehalten.
 
-\textbf{Paketierung.} Die Anwendung wird mit PyInstaller eingefroren und mit \texttt{fpm} in ein Debian-Paket verpackt, sodass sie auf dem Vorlesungsserver nativ installiert werden kann:
+\textbf{Paketierung.} Die Anwendung wird mit PyInstaller eingefroren und mit \texttt{fpm} in ein Debian-Paket verpackt, sodass sie auf dem Vorlesungsserver nativ installiert werden kann[cite: 4]:
 
 \begin{lstlisting}[language=bash, caption={Bauen und Installieren der .deb-Datei}]
 uv run pyinstaller --name exam-frontend --onedir --windowed src/exam_frontend/__main__.py
