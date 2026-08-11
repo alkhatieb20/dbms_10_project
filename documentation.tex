@@ -18,7 +18,7 @@
 \textbf{Autor:} Abdullah Alkhatieb (259697) \\
 \textbf{Modul:} Introduction to Database Management Systems · THGA Bochum \\
 \textbf{Stack:} PostgreSQL · FastAPI · Docker Compose · tkinter (\texttt{.deb}) \\
-\textbf{Repository:} \url{https://github.com/<user>/exam-generation}
+\textbf{Repository:} \url{https://github.com/alkhatieb20/dbms_10_project}
 \end{infobox}
 
 \tableofcontents
@@ -28,7 +28,7 @@
 \section{Einleitung und Motivation}
 % ============================================================
 
-Die manuelle Erstellung von Prüfungsbögen und den dazugehörigen Musterlösungen ist ein zeitaufwändiger und fehleranfälliger Prozess. Häufig kommt es zu Fehlern bei der Berechnung der Gesamtpunktzahl oder bei der Formatierung komplexer Formeln. 
+Die manuelle Erstellung von Prüfungsbögen und den dazugehörigen Musterlösungen ist ein zeitaufwändiger und fehleranfälliger Prozess. Häufig kommt es zu Fehlern bei der Berechnung der Gesamtpunktzahl oder bei der Formatierung komplexer Formeln.
 
 Das \textbf{Automatic Exam Generation} System löst dieses Problem durch eine datenbankgestützte Anwendung. Es verwaltet \textbf{Kurse}, \textbf{Themen}, \textbf{Fragen} und \textbf{Prüfungen}. Es stellt die Daten über eine REST-API bereit und bietet eine Desktop-GUI (Frontend) für Dozenten.
 
@@ -140,7 +140,7 @@ Beim Start wird ein \textbf{Verbindungsdialog (Connection Dialog)} angezeigt, de
 
 \textbf{Paketierung.} Die Anwendung wird mit PyInstaller eingefroren und mit \texttt{fpm} in ein Debian-Paket verpackt, sodass sie auf dem Vorlesungsserver nativ installiert werden kann:
 
-\begin{lstlisting}[caption={Bauen und Installieren der .deb-Datei}]
+\begin{lstlisting}[language=bash, caption={Bauen und Installieren der .deb-Datei}]
 uv run pyinstaller --name exam-frontend --onedir --windowed src/exam_frontend/__main__.py
 mkdir -p pkg/usr/bin && cp -r dist/exam-frontend pkg/usr/bin/
 fpm -s dir -t deb --name exam-frontend --version 0.1.0 --architecture amd64 -C pkg .
@@ -153,7 +153,7 @@ sudo dpkg -i exam-frontend_0.1.0_amd64.deb
 
 Das Backend läuft als zwei Container, die durch Docker Compose orchestriert und bereitgestellt werden. Anmeldeinformationen (Passwörter, API-Key) befinden sich sicher in einer \texttt{.env}-Datei.
 
-\begin{lstlisting}[caption={docker-compose.yml (Auszug)}]
+\begin{lstlisting}[language=bash, caption={docker-compose.yml (Auszug)}]
 services:
   postgres:
     image: postgres:16
@@ -180,7 +180,7 @@ volumes:
   \item \texttt{docker compose up -d --build} -- Startet Datenbank und API.
   \item \texttt{docker compose exec api pytest -v} -- Führt automatisierte Tests aus.
   \item \texttt{sudo dpkg -i exam-frontend\_0.1.0\_amd64.deb} -- Installiert das Frontend.
-  \item Starten Sie \texttt{exam-frontend} (über /usr/bin/exam-frontend/exam-frontend) und verbinden Sie sich über den Dialog.
+  \item Starten Sie \texttt{exam-frontend} und verbinden Sie sich über den Dialog.
 \end{enumerate}
 
 % ============================================================
@@ -202,4 +202,3 @@ Mit Quellenangabe wiederverwendet:
 \end{itemize}
 
 \end{document}
-
